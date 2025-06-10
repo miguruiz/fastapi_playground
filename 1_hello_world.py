@@ -21,8 +21,8 @@ BOOKS = {
     4: {"title": "Moby Dick", "author": "Herman Melville", "year": 1851},
 }
 
-
-@app.get("/books")
+# Endpoint to get all books, should be placed ahead of the path parameter, because of the order of the routes
+@app.get("/books/allbooks")
 async def read_all_books():
     return BOOKS
 

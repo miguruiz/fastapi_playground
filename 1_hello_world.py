@@ -29,5 +29,13 @@ async def read_all_books():
 
 # Path Parameters
 @app.get("/books/{book_id}")
-async def read_all_books(book_id: int):
+async def get_book_by_id(book_id: int):
     return BOOKS[book_id]
+
+@app.get("/books/title/{book_title}")
+# eg. http://127.0.0.1:8000/books/title/1984
+# eg. http://127.0.0.1:8000/books/title/To%20Kill%20a%20Mockingbird
+async def get_book_by_title(book_title: str):
+    return [book for book in BOOKS.values() if book['title'].lower() == book_title.lower()]
+
+

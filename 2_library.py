@@ -42,17 +42,47 @@ class BookRequest(BaseModel):
     }
 
 
-BOOKS = []
+BOOKS = [
+    Book(id=1, title="1984", author="George Orwell", desc="A dystopian novel set in a totalitarian society.", rating=5),
+    Book(id=2, title="To Kill a Mockingbird", author="Harper Lee", desc="A novel about racial injustice in the Deep South.", rating=4),
+]
 
 @app.get("/books/allbooks")
 async def read_all_books():
     return BOOKS
+
+@app.get("/books/")
+async def get_books_by_rating(rating: int):
+    return [book for book in BOOKS if book.rating >= rating]
+
+@app.get("/books/{book_id}")
+async def read_book_by_id(book_id: int):
+    for book in BOOKS:
+        if book.id == book_id:
+            return book
+    return {"error": "Book not found"}
 
 
 @app.post("/books/add_book")
 async def add_new_book(book: BookRequest):
     new_boook= book_with_id(book)
     BOOKS.append(new_boook)
+
+
+@app.put("/books/update_book")
+async def update_book(book: BookRequest):
+    for index, existing_book in enumerate(BOOKS):
+        if existing_book.title.casefold() == book.title.casefold():
+            book.id = existing_book.id
+            BOOKS[index] = Book(**book.model_dump())
+
+@app.delete("/books/delete/{book_id}")
+async def delete_book(book_id: int):
+    for index, book in enumerate(BOOKS):
+        if book.id == book_id:
+            BOOKS.pop(index)
+            break
+
 
 
 def book_with_id(book: BookRequest):

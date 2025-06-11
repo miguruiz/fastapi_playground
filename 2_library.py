@@ -1,6 +1,6 @@
 from typing import Optional
 
-from fastapi import FastAPI, Body
+from fastapi import FastAPI, Path
 from pydantic import BaseModel, Field
 # .dict() function is now renamed to .model_dump()
 # schema_extra function within a Config class is now renamed to json_schema_extra
@@ -56,7 +56,7 @@ async def get_books_by_rating(rating: int):
     return [book for book in BOOKS if book.rating >= rating]
 
 @app.get("/books/{book_id}")
-async def read_book_by_id(book_id: int):
+async def read_book_by_id(book_id: int = Path(gt = 0)):
     for book in BOOKS:
         if book.id == book_id:
             return book

@@ -2,7 +2,7 @@ from typing import Annotated, Optional
 
 from fastapi import APIRouter, Depends, Path, HTTPException
 from models import Todos
-from database import SessionLocal
+from database import SessionLocal, get_db
 from sqlalchemy.orm import Session
 from starlette import status
 from pydantic import BaseModel, Field
@@ -10,16 +10,16 @@ from pydantic import BaseModel, Field
 
 router = APIRouter()
 
-def get_db():
-     db = SessionLocal()
-     try:
-        yield db # This is a generator function that yields a database session because FastAPI uses dependency injection
-        # to manage resources like database connections. When the request is done, FastAPI will automatically close the session.
-        # If we don't use yield here, the session would be closed immediately after the function returns, which would not allow us
-        # to use the session in the request handler.
-     finally:
-        db.close()
-
+# def get_db():
+#      db = SessionLocal()
+#      try:
+#         yield db # This is a generator function that yields a database session because FastAPI uses dependency injection
+#         # to manage resources like database connections. When the request is done, FastAPI will automatically close the session.
+#         # If we don't use yield here, the session would be closed immediately after the function returns, which would not allow us
+#         # to use the session in the request handler.
+#      finally:
+#         db.close()
+#
 db_dependency = Annotated[Session, Depends(get_db)]  # This is a type annotation for the database dependency
 
 class TodoRequest(BaseModel):

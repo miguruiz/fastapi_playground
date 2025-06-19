@@ -1,0 +1,5 @@
+{
+  "name": "Python Dev",
+  "image": "mcr.microsoft.com/devcontainers/python:3.11",
+  "postCreateCommand": "pip3 install -r requirements.txt --index-url https://nexus.devnet.klm.com/repository/pypi-all/simple"
+}

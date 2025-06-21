@@ -1,7 +1,7 @@
 from datetime import timedelta, datetime, timezone
 from typing import Annotated
 
-from fastapi import  APIRouter, Depends
+from fastapi import  APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from starlette import status
@@ -9,13 +9,18 @@ from starlette import status
 from database import get_db
 from models import Users
 from passlib.context import CryptContext
-from fastapi.security import OAuth2PasswordRequestForm
-from jose import  jwt
+from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
+from jose import  jwt, JWTError
 
-router = APIRouter()# If we used FastAPI, it would be an instance of FastAPI, but here we use APIRouter to
+router = APIRouter(
+    prefix='/auth',
+    tags=['auth']
+)# If we used FastAPI, it would be an instance of FastAPI, but here we use APIRouter to
 # create a router for the auth endpoints. This allows us to group related endpoints together
 
 bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
+oauth2_bearer = OAuth2PasswordBearer(tokenUrl='auth/token')
+
 
 SECRET_KEY = '5b3a0f116bbdd192024d265939689baab023d45a691241e37b06a2fc0ee51503'
 ALGORITHM = 'HS256'
@@ -49,7 +54,23 @@ class Token(BaseModel):
     access_token: str
     token_type: str
 
-@router.post("/auth", status_code=status.HTTP_201_CREATED)
+async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, ALGORITHM)
+        username: str = payload.get('sub')
+        user_id: int = payload.get('id')
+        if username is None or user_id is None:
+            raise HTTPException(status_code = status.HTTP_401_UNAUTHORIZED,
+                                detail='Could not validate user.')
+        return {'username':username, 'id':user_id}
+
+    except JWTError:
+        raise HTTPException(status_code = status.HTTP_401_UNAUTHORIZED,
+                            detail='Could not validate user.')
+
+
+
+@router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_user(create_user_request: CreateUserRequest, db: db_dependency):
     create_user_model = Users(
     email = create_user_request.email,
@@ -69,7 +90,8 @@ async def create_user(create_user_request: CreateUserRequest, db: db_dependency)
 async def login_for_access_token(from_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_dependency):
     user = authenticate_user(from_data.username, from_data.password, db)
     if not user:
-        return 'Failed Authentication'
+        raise HTTPException(status_code = status.HTTP_401_UNAUTHORIZED,
+                      detail='Could not validate user.')
     token = create_access_token(user.username,
                                 user.id,
                                 timedelta(minutes=20))

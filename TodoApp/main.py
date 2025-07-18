@@ -1,9 +1,10 @@
 from typing import Annotated, Optional
 
 from fastapi import FastAPI
+
 import models
 from database import engine
-from routers import auth, todos, admin
+from routers import auth, todos, admin, users
 
 app = FastAPI()
 
@@ -18,3 +19,4 @@ app.include_router(
     todos.router
 )  # Include the todos router to handle todo-related endpoints
 app.include_router(admin.router)
+app.include_router(users.router)

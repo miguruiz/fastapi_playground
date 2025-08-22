@@ -11,8 +11,10 @@ class Users(Base):
     first_name = Column(String)
     last_name = Column(String)
     hashed_password = Column(String)
-    is_active = Column(Boolean, default= True)
+    is_active = Column(Boolean, default=True)
     role = Column(String)
+    phone_number = Column(String)
+
 
 class Todos(Base):
     __tablename__ = "todos"
@@ -23,7 +25,3 @@ class Todos(Base):
     priority = Column(Integer, default=1)
     complete = Column(Boolean, default=False)
     owner_id = Column(Integer, ForeignKey("users.id"))
-
-
-
-

@@ -1,8 +1,8 @@
 from typing import Annotated, Optional
 
 from fastapi import APIRouter, Depends, Path, HTTPException
-from models import Todos
-from database import SessionLocal, get_db
+from ..models import Todos
+from ..database import SessionLocal, get_db
 from sqlalchemy.orm import Session
 from starlette import status
 from pydantic import BaseModel, Field

@@ -91,3 +91,45 @@ def test_create_todo(test_todo):
     assert model.description == request_date.get('description')
     assert model.priority == request_date.get('priority')
     assert model.complete == request_date.get('complete')
+
+
+
+def test_update_todo (test_todo):
+    request_date = {
+        'title': 'New Todo!',
+        'description':"New todo description",
+        'priority': 5,
+        'complete': False
+    }
+    response = client.put(f'/todos/update/1', json = request_date)
+
+    assert response.status_code == 204
+
+    db = TestingSessionLocal()
+    model = db.query(Todos).filter(Todos.id == 1).first()
+    assert model.title == request_date.get('title')
+    assert model.description == request_date.get('description')
+    assert model.priority == request_date.get('priority')
+    assert model.complete == request_date.get('complete')
+
+
+def test_update_todo_not_found (test_todo):
+    request_date = {
+        'title': 'New Todo!',
+        'description':"New todo description",
+        'priority': 5,
+        'complete': False
+    }
+    response = client.put(f'/todos/update/999', json = request_date)
+
+    assert response.status_code == 404
+    assert response.json() == {'detail': "Todo not found."}
+
+def test_update_delete_todo (test_todo):
+
+    response = client.delete(f'/todos/delete/1')
+
+    assert response.status_code == 204
+    db = TestingSessionLocal()
+    model = db.query(Todos).filter(Todos.id == 1).first()
+    assert model == None

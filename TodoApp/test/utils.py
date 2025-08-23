@@ -73,8 +73,8 @@ def test_user():
 
 
 
-oauth2_bearer = OAuth2PasswordBearer(tokenUrl="auth/token")
+# oauth2_bearer = OAuth2PasswordBearer(tokenUrl="auth/token")
 
 
-SECRET_KEY = "5b3a0f116bbdd192024d265939689baab023d45a691241e37b06a2fc0ee51503"
-ALGORITHM = "HS256"
+# SECRET_KEY = "5b3a0f116bbdd192024d265939689baab023d45a691241e37b06a2fc0ee51503"
+# ALGORITHM = "HS256"

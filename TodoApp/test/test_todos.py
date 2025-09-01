@@ -9,7 +9,7 @@ app.dependency_overrides[get_db] = override_get_db
 app.dependency_overrides[get_current_user] = override_get_current_user
 
 def test_read_all_authenticated(test_todo):
-    response = client.get("/")
+    response = client.get("/todos")
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == [{'id': 1, 'priority': 0, 'owner_id': 1, 'title': 'Learn to code', 'complete': False, 'description': 'Need to learn every day!'}]
 

@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from jose import jwt
+from starlette.exceptions import HTTPException
 
 from .utils import *
 from ..routers.auth import get_db, get_current_user, \
@@ -44,3 +45,16 @@ async def test_get_current_user(test_user):
     user = await get_current_user(token)
 
     assert user == {"username": username, "id": id, "user_role": role}
+
+
+@pytest.mark.asyncio
+async def test_get_current_user_not_valid(test_user):
+    role= "bar"
+
+    encode = {"role": role}
+    token = jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)
+
+    with pytest.raises(HTTPException) as e:
+        await get_current_user(token)
+    assert e.value.status_code == 401
+    assert e.value.detail == 'Could not validate user.'

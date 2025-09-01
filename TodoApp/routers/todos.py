@@ -8,7 +8,10 @@ from starlette import status
 from pydantic import BaseModel, Field
 from .auth import get_current_user
 
-router = APIRouter()
+router = APIRouter(
+    prefix='/todos',
+    tags=['todos']
+)
 
 db_dependency = Annotated[
     Session, Depends(get_db)
@@ -44,7 +47,7 @@ async def read_all(user: user_dependency, db: db_dependency):
     )  # This will return all the todos from the database
 
 
-@router.get("/todos/{todo_id}", status_code=status.HTTP_200_OK)
+@router.get("/{todo_id}", status_code=status.HTTP_200_OK)
 async def read_todo_from_id(
     user: user_dependency, db: db_dependency, todo_id: int = Path(gt=0)
 ):
@@ -63,7 +66,7 @@ async def read_todo_from_id(
         raise HTTPException(status_code=404, detail="Todo not found.")
 
 
-@router.post("/todos/add_todo", status_code=status.HTTP_201_CREATED)
+@router.post("/add_todo", status_code=status.HTTP_201_CREATED)
 async def add_todo(user: user_dependency, db: db_dependency, new_todo: TodoRequest):
 
     if user is None:
@@ -76,7 +79,7 @@ async def add_todo(user: user_dependency, db: db_dependency, new_todo: TodoReque
     db.commit()
 
 
-@router.put("/todos/update/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.put("/update/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def update_todo(
     user: user_dependency,
     db: db_dependency,
@@ -105,7 +108,7 @@ async def update_todo(
     db.commit()
 
 
-@router.delete("/todos/delete/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/delete/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_todo(
     user: user_dependency, db: db_dependency, todo_id: int = Path(gt=0)
 ):

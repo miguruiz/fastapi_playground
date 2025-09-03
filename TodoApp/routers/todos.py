@@ -1,6 +1,7 @@
 from typing import Annotated, Optional
 
 from fastapi import APIRouter, Depends, Path, HTTPException
+from sqlalchemy import and_
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
@@ -73,7 +74,23 @@ async def render_add_todo_page(request:Request):
     except:
         return redirect_to_login()
 
+@router.get("/edit-todo-page/{todo_id}")
+async def render_edit_todo_page(request:Request, db: db_dependency, todo_id:int = Path(gt=0)):
+    try:
+        user = await get_current_user(request.cookies.get('access_token'))
+        if user is None:
+            return redirect_to_login()
 
+        todo = db.query(Todos).filter(
+            and_(
+                Todos.owner_id == user.get("id"),
+                Todos.id == todo_id
+            )
+        ).first()
+        return templates.TemplateResponse("edit-todo.html",{"request": request,"todo":todo,"user":user})
+
+    except:
+        return redirect_to_login()
 
 ### ENDPOINTS ###
 

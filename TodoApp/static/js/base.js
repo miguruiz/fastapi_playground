@@ -44,6 +44,7 @@
     const editTodoForm = document.getElementById('editTodoForm');
     if (editTodoForm) {
         editTodoForm.addEventListener('submit', async function (event) {
+        if (event.submitter?.id !== 'editButton') return;
         event.preventDefault();
         const form = event.target;
         const formData = new FormData(form);
@@ -67,7 +68,7 @@
 
             console.log(`${todoId}`)
 
-            const response = await fetch(`/todos/todo/${todoId}`, {
+            const response = await fetch(`/todos/update/${todoId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -93,13 +94,18 @@
             var url = window.location.pathname;
             const todoId = url.substring(url.lastIndexOf('/') + 1);
 
+            const confirmed = confirm("Are you sure you want to delete this item?");
+            if (!confirmed) {
+                return; // User clicked "Cancel"
+            }
+
             try {
                 const token = getCookie('access_token');
                 if (!token) {
                     throw new Error('Authentication token not found');
                 }
 
-                const response = await fetch(`/todos/todo/${todoId}`, {
+                const response = await fetch(`/todos/delete/${todoId}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${token}`

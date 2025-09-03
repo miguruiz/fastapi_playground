@@ -1,9 +1,12 @@
 from fastapi import FastAPI, Request
+from starlette import status
 
 from .database import Base, engine
 from .routers import auth, todos, admin, users
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+from starlette.responses import RedirectResponse
+
 app = FastAPI()
 
 Base.metadata.create_all(bind=engine)  # Create the database tables if they do not exist
@@ -22,9 +25,8 @@ app.include_router(admin.router)
 app.include_router(users.router)
 
 @app.get("/")
-def test(request:Request):
-    return templates.TemplateResponse("home.html",{"request":request})
-
+def home(request:Request):
+    return RedirectResponse(url="/todos/todo-page", status_code=status.HTTP_302_FOUND)
 
 @app.get("/healthy")
 def health_check():
